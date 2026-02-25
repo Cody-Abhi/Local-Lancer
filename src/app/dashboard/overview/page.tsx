@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   MapPin, 
   TrendingUp, 
@@ -15,12 +14,12 @@ import {
   Briefcase, 
   ChevronRight, 
   Smartphone, 
-  Code,
-  Sparkles,
-  Search
+  Code
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { cn } from '@/lib/utils';
+import { useFirestore, useUser, useDoc, useCollection, useMemoFirebase } from '@/firebase';
+import { doc, collection, query, limit } from 'firebase/firestore';
 
 const chartData = [
   { name: 'Mon', views: 300 },
@@ -34,6 +33,35 @@ const chartData = [
 
 export default function DashboardOverview() {
   const [isAvailable, setIsAvailable] = useState(true);
+  const { user } = useUser();
+  const db = useFirestore();
+
+  // Fetch Real-time Stats
+  const statsRef = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return doc(db, 'users', user.uid, 'stats', 'summary');
+  }, [db, user]);
+  const { data: stats } = useDoc<any>(statsRef);
+
+  // Fetch Real-time Milestones
+  const milestonesRef = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return query(collection(db, 'users', user.uid, 'milestones'), limit(5));
+  }, [db, user]);
+  const { data: milestones = [] } = useCollection<any>(milestonesRef);
+
+  // Fallback values if no data exists in Firestore yet (to keep prototype looking good)
+  const displayStats = {
+    earnings: stats?.totalEarnings ?? 45200,
+    balance: stats?.escrowBalance ?? 12500,
+    projects: stats?.activeProjectsCount ?? 3,
+    views: stats?.profileViews ?? 1248
+  };
+
+  const displayMilestones = milestones.length > 0 ? milestones : [
+    { id: 'm1', title: "E-commerce App UI Design", description: "Milestone 2: Wireframes & High-fidelity", progress: 75, dueDate: "Due in 2 days", type: 'design' },
+    { id: 'm2', title: "React Component Library", description: "Milestone 1: Button System", progress: 30, dueDate: "Due in 5 days", type: 'dev' }
+  ];
 
   return (
     <div className="space-y-6 max-w-[1200px] mx-auto pb-10">
@@ -66,21 +94,21 @@ export default function DashboardOverview() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <MetricCard 
           title="Total Earnings" 
-          value="₹45,200" 
+          value={`₹${displayStats.earnings.toLocaleString('en-IN')}`} 
           trend="+12%" 
           icon={<TrendingUp className="w-5 h-5 text-green-500" />} 
           variant="green"
         />
         <MetricCard 
           title="Escrow Balance" 
-          value="₹12,500" 
+          value={`₹${displayStats.balance.toLocaleString('en-IN')}`} 
           trend="+5%" 
           icon={<Wallet className="w-5 h-5 text-blue-500" />} 
           variant="blue"
         />
         <MetricCard 
           title="Active Projects" 
-          value="3" 
+          value={displayStats.projects.toString()} 
           trend="0%" 
           icon={<Briefcase className="w-5 h-5 text-orange-500" />} 
           variant="orange"
@@ -97,20 +125,16 @@ export default function DashboardOverview() {
               <Button variant="link" className="text-primary font-bold">View All</Button>
             </CardHeader>
             <CardContent className="space-y-6">
-              <MilestoneItem 
-                title="E-commerce App UI Design" 
-                description="Milestone 2: Wireframes & High-fidelity" 
-                progress={75} 
-                dueDate="Due in 2 days"
-                icon={<Smartphone className="w-5 h-5" />}
-              />
-              <MilestoneItem 
-                title="React Component Library" 
-                description="Milestone 1: Button System" 
-                progress={30} 
-                dueDate="Due in 5 days"
-                icon={<Code className="w-5 h-5" />}
-              />
+              {displayMilestones.map((m: any) => (
+                <MilestoneItem 
+                  key={m.id}
+                  title={m.title} 
+                  description={m.description} 
+                  progress={m.progress} 
+                  dueDate={m.dueDate}
+                  icon={m.type === 'design' ? <Smartphone className="w-5 h-5" /> : <Code className="w-5 h-5" />}
+                />
+              ))}
             </CardContent>
           </Card>
 
@@ -127,7 +151,7 @@ export default function DashboardOverview() {
               </div>
             </CardHeader>
             <CardContent>
-               <div className="text-3xl font-bold mb-6">1,248</div>
+               <div className="text-3xl font-bold mb-6">{displayStats.views.toLocaleString()}</div>
                <div className="h-64 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData}>
@@ -148,7 +172,7 @@ export default function DashboardOverview() {
                         {chartData.map((entry, index) => (
                           <Cell 
                             key={`cell-${index}`} 
-                            fill={index === 5 ? '#FF8C2B' : '#FFE8D6'} 
+                            fill={index === 5 ? 'hsl(var(--primary))' : 'hsl(var(--secondary))'} 
                           />
                         ))}
                       </Bar>
@@ -210,6 +234,7 @@ export default function DashboardOverview() {
               src="https://picsum.photos/seed/lucknow_map_dashboard/600/400" 
               alt="Lucknow Map" 
               className="w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-500"
+              data-ai-hint="Lucknow map"
              />
              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-4">
                 <div className="text-white text-xs font-medium mb-0.5">View Map</div>

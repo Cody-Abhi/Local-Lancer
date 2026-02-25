@@ -28,6 +28,29 @@
       },
       "required": ["uid", "role", "name"]
     },
+    "UserStats": {
+      "title": "User Stats",
+      "description": "Real-time financial and activity metrics for a user.",
+      "type": "object",
+      "properties": {
+        "totalEarnings": { "type": "number" },
+        "escrowBalance": { "type": "number" },
+        "activeProjectsCount": { "type": "number" },
+        "profileViews": { "type": "number" }
+      }
+    },
+    "Milestone": {
+      "title": "Milestone",
+      "description": "A project milestone for a freelancer or client.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "progress": { "type": "number" },
+        "dueDate": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "in-progress", "completed"] }
+      }
+    },
     "Conversation": {
       "title": "Conversation",
       "description": "A chat session between two users.",
@@ -57,6 +80,14 @@
     "/users/{userId}": {
       "schema": "#/entities/User",
       "description": "User profile documents indexed by Firebase Auth UID."
+    },
+    "/users/{userId}/stats/summary": {
+      "schema": "#/entities/UserStats",
+      "description": "Real-time stats for the user."
+    },
+    "/users/{userId}/milestones/{milestoneId}": {
+      "schema": "#/entities/Milestone",
+      "description": "Milestones associated with the user's active projects."
     },
     "/conversations/{conversationId}": {
       "schema": "#/entities/Conversation",
