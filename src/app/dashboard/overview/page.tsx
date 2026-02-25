@@ -14,7 +14,6 @@ import {
   ChevronRight, 
   Smartphone, 
   Code,
-  Zap
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { cn } from '@/lib/utils';
@@ -64,19 +63,19 @@ export default function DashboardOverview() {
     <div className="space-y-8 max-w-[1400px] mx-auto pb-20">
       {/* Availability Status Card */}
       <Card className="bg-card/40 border-primary/10 shadow-2xl rounded-[2rem] overflow-hidden">
-        <CardContent className="p-10 flex items-center justify-between bg-gradient-to-r from-primary/10 via-transparent to-transparent">
+        <CardContent className="p-6 md:p-10 flex flex-col md:flex-row items-center justify-between bg-gradient-to-r from-primary/10 via-transparent to-transparent gap-6">
           <div className="flex items-start gap-6">
-            <div className="p-4 bg-primary/20 rounded-2xl shadow-xl shadow-primary/5">
+            <div className="p-4 bg-primary/20 rounded-2xl shadow-xl shadow-primary/5 shrink-0">
               <MapPin className="w-8 h-8 text-primary" />
             </div>
             <div className="space-y-2">
               <h3 className="font-black text-2xl italic tracking-tight text-white">Lucknow Active Status</h3>
-              <p className="text-muted-foreground text-base max-w-xl font-medium leading-relaxed">
+              <p className="text-muted-foreground text-sm md:text-base max-w-xl font-medium leading-relaxed">
                 You are currently visible to clients in <span className="text-primary font-bold underline decoration-primary/30 underline-offset-4">Gomti Nagar & Hazratganj</span>. Toggle to pause new local inquiries.
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-4 bg-background/60 p-3 px-6 rounded-2xl border border-primary/20 shadow-inner">
+          <div className="flex items-center gap-4 bg-background/60 p-3 px-6 rounded-2xl border border-primary/20 shadow-inner shrink-0">
             <Switch 
               checked={isAvailable} 
               onCheckedChange={setIsAvailable} 
@@ -243,7 +242,7 @@ export default function DashboardOverview() {
   );
 }
 
-function MetricCard({ title, value, trend, icon, variant }: { 
+function MetricCard({ title, value, trend, icon }: { 
   title: string, 
   value: string, 
   trend: string, 

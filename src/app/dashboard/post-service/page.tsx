@@ -1,9 +1,8 @@
-
 "use client";
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,12 +23,12 @@ import {
   ShieldCheck, 
   Clock, 
   Zap, 
-  CheckCircle2, 
   Lightbulb,
-  Check
+  Check,
+  Briefcase
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useFirestore, useUser } from '@/firebase';
+import { useFirestore, useUser, errorEmitter, FirestorePermissionError } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { toast } from '@/hooks/use-toast';
 
@@ -54,7 +53,7 @@ export default function PostServicePage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handlePublish = async () => {
+  const handlePublish = () => {
     if (!form.title || !form.category || !form.price || !user || !db) {
       toast({
         title: "Missing Information",
@@ -65,31 +64,32 @@ export default function PostServicePage() {
     }
 
     setIsSubmitting(true);
-    try {
-      await addDoc(collection(db, 'services'), {
-        ...form,
-        price: Number(form.price),
-        freelancerId: user.uid,
-        freelancerName: user.displayName || 'Anonymous',
-        freelancerAvatar: user.photoURL || '',
-        createdAt: serverTimestamp(),
+    const servicesRef = collection(db, 'services');
+    const data = {
+      ...form,
+      price: Number(form.price),
+      freelancerId: user.uid,
+      freelancerName: user.displayName || 'Anonymous',
+      freelancerAvatar: user.photoURL || '',
+      createdAt: serverTimestamp(),
+    };
+
+    addDoc(servicesRef, data)
+      .then(() => {
+        toast({
+          title: "Service Published!",
+          description: "Your new service package is now live in Lucknow.",
+        });
+        router.push('/dashboard/freelancers');
+      })
+      .catch(async (err) => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
+          path: servicesRef.path,
+          operation: 'create',
+          requestResourceData: data
+        }));
+        setIsSubmitting(false);
       });
-      
-      toast({
-        title: "Service Published!",
-        description: "Your new service package is now live in Lucknow.",
-      });
-      router.push('/dashboard/freelancers');
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: "Error",
-        description: "Failed to publish service. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   const togglePerk = (key: keyof typeof form.perks) => {
@@ -363,24 +363,4 @@ function PerkOption({ label, description, checked, onClick }: { label: string, d
       </div>
     </div>
   );
-}
-
-function Briefcase(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-      <rect width="20" height="14" x="2" y="6" rx="2" />
-    </svg>
-  )
 }

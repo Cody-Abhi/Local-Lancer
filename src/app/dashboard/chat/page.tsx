@@ -1,20 +1,22 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Languages, Phone, Video, Info, Search, MoreVertical, Sparkles, User as UserIcon, MessageSquare as MsgIcon } from 'lucide-react';
+import { Send, Languages, Phone, Video, Info, Search, MoreVertical, Sparkles, User as UserIcon, MessageSquare as MsgIcon, ShieldCheck } from 'lucide-react';
 import { dynamicChatTranslation } from '@/ai/flows/dynamic-chat-translation';
-import { ChatMessage, User } from '@/lib/types';
+import { User } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { 
   useFirestore, 
   useUser, 
   useCollection, 
-  useMemoFirebase 
+  useMemoFirebase,
+  errorEmitter,
+  FirestorePermissionError
 } from '@/firebase';
 import { 
   collection, 
@@ -24,7 +26,6 @@ import {
   serverTimestamp, 
   doc, 
   updateDoc,
-  where,
   limit,
   setDoc
 } from 'firebase/firestore';
@@ -38,9 +39,10 @@ export default function ChatPage() {
   const [isTranslating, setIsTranslating] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const conversationId = activeRecipient && currentUser 
-    ? [currentUser.uid, activeRecipient.id].sort().join('_') 
-    : null;
+  const conversationId = useMemoFirebase(() => {
+    if (!currentUser || !activeRecipient) return null;
+    return [currentUser.uid, activeRecipient.id].sort().join('_');
+  }, [currentUser, activeRecipient]);
 
   const messagesQuery = useMemoFirebase(() => {
     if (!db || !conversationId) return null;
@@ -59,23 +61,36 @@ export default function ChatPage() {
     }
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || !currentUser || !conversationId || !db) return;
+  const handleSend = () => {
+    if (!input.trim() || !currentUser || !conversationId || !db || !activeRecipient) return;
 
     const messageText = input;
     setInput('');
 
     const convRef = doc(db, 'conversations', conversationId);
     setDoc(convRef, {
-      participants: [currentUser.uid, activeRecipient?.id],
+      participants: [currentUser.uid, activeRecipient.id],
       lastMessage: messageText,
       updatedAt: serverTimestamp()
-    }, { merge: true });
+    }, { merge: true }).catch(async (err) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: convRef.path,
+        operation: 'write',
+        requestResourceData: { lastMessage: messageText }
+      }));
+    });
 
-    addDoc(collection(db, 'conversations', conversationId, 'messages'), {
+    const messagesRef = collection(db, 'conversations', conversationId, 'messages');
+    addDoc(messagesRef, {
       senderId: currentUser.uid,
       text: messageText,
       timestamp: serverTimestamp()
+    }).catch(async (err) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: messagesRef.path,
+        operation: 'create',
+        requestResourceData: { text: messageText }
+      }));
     });
   };
 
@@ -85,19 +100,25 @@ export default function ChatPage() {
     try {
       const res = await dynamicChatTranslation({ message: text, targetLanguage: 'Hindi' });
       const msgRef = doc(db, 'conversations', conversationId, 'messages', msgId);
-      updateDoc(msgRef, { translatedText: res.translatedMessage });
+      updateDoc(msgRef, { translatedText: res.translatedMessage }).catch(async (err) => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
+          path: msgRef.path,
+          operation: 'update',
+          requestResourceData: { translatedText: res.translatedMessage }
+        }));
+      });
     } catch (e) {
-      console.error(e);
+      // Errors handled by Genkit or UI
     } finally {
       setIsTranslating(false);
     }
   };
 
   return (
-    <div className="h-[calc(100vh-160px)] flex gap-8 max-w-[1600px] mx-auto pb-10">
+    <div className="h-[calc(100vh-160px)] flex flex-col lg:flex-row gap-8 max-w-[1600px] mx-auto pb-10">
       {/* Sidebar Contacts */}
       <Card className="hidden lg:flex flex-col w-96 bg-card/40 shrink-0 border-border/50 rounded-[2.5rem] overflow-hidden shadow-2xl">
-        <CardHeader className="p-8 border-b border-border/50 bg-secondary/20">
+        <div className="p-8 border-b border-border/50 bg-secondary/20">
           <div className="relative group">
             <Search className="absolute left-4 top-4 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <Input 
@@ -105,7 +126,7 @@ export default function ChatPage() {
               className="h-14 pl-12 bg-background/50 border-border/50 rounded-2xl font-bold" 
             />
           </div>
-        </CardHeader>
+        </div>
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-2">
             {mockUsers.map((user) => (
@@ -268,24 +289,4 @@ function ChatAction({ icon }: { icon: React.ReactNode }) {
       {icon}
     </Button>
   );
-}
-
-function ShieldCheck(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
-      <path d="m9 12 2 2 4-4" />
-    </svg>
-  )
 }
