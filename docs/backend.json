@@ -27,6 +27,27 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["uid", "role", "name"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "A chat session between two users.",
+      "type": "object",
+      "properties": {
+        "participants": { "type": "array", "items": { "type": "string" } },
+        "lastMessage": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A single chat message.",
+      "type": "object",
+      "properties": {
+        "senderId": { "type": "string" },
+        "text": { "type": "string" },
+        "translatedText": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
     }
   },
   "auth": {
@@ -36,6 +57,14 @@
     "/users/{userId}": {
       "schema": "#/entities/User",
       "description": "User profile documents indexed by Firebase Auth UID."
+    },
+    "/conversations/{conversationId}": {
+      "schema": "#/entities/Conversation",
+      "description": "Conversations between users."
+    },
+    "/conversations/{conversationId}/messages/{messageId}": {
+      "schema": "#/entities/Message",
+      "description": "Messages within a conversation."
     }
   }
 }

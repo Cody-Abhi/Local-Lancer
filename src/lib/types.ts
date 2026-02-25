@@ -1,3 +1,4 @@
+
 export type UserRole = 'freelancer' | 'client' | 'admin';
 
 export interface User {
@@ -39,10 +40,17 @@ export interface Job {
 export interface ChatMessage {
   id: string;
   senderId: string;
-  receiverId: string;
   text: string;
-  timestamp: string;
+  timestamp: any;
   translatedText?: string;
+}
+
+export interface Conversation {
+  id: string;
+  participants: string[];
+  lastMessage?: string;
+  updatedAt: any;
+  recipient?: User;
 }
 
 export interface Milestone {
