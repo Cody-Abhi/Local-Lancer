@@ -1,5 +1,7 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
   title: 'LucknowConnect | Geo-Targeted Freelance Marketplace',
@@ -21,7 +23,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#10111A" />
       </head>
       <body className="font-body antialiased bg-background text-foreground">
-        {children}
+        <FirebaseClientProvider>
+          {children}
+        </FirebaseClientProvider>
       </body>
     </html>
   );
