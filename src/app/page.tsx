@@ -25,14 +25,14 @@ export default function Home() {
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center rotate-3">
-              <span className="text-white font-black text-lg italic">L</span>
+              <span className="text-white font-black text-xl italic">L</span>
             </div>
             <span className="text-xl font-black tracking-tighter italic text-white">LucknowLink</span>
           </div>
           
           <nav className="hidden lg:flex items-center gap-10">
-            <Link href="#" className="text-[11px] font-black uppercase tracking-widest text-muted-foreground hover:text-white transition-colors">Find Work</Link>
-            <Link href="#" className="text-[11px] font-black uppercase tracking-widest text-muted-foreground hover:text-white transition-colors">Hire Freelancers</Link>
+            <Link href="/dashboard/jobs" className="text-[11px] font-black uppercase tracking-widest text-muted-foreground hover:text-white transition-colors">Find Work</Link>
+            <Link href="/dashboard/freelancers" className="text-[11px] font-black uppercase tracking-widest text-muted-foreground hover:text-white transition-colors">Hire Freelancers</Link>
             <Link href="#" className="text-[11px] font-black uppercase tracking-widest text-muted-foreground hover:text-white transition-colors">Why Us</Link>
           </nav>
 
@@ -76,7 +76,7 @@ export default function Home() {
             </p>
             
             <div className="flex flex-wrap gap-4 pt-4">
-              <Link href="/signup">
+              <Link href="/dashboard/freelancers">
                 <Button size="lg" className="bg-primary text-white hover:bg-primary/90 h-16 px-10 text-sm font-black uppercase italic tracking-widest rounded-2xl shadow-2xl shadow-primary/20 transition-transform active:scale-95">
                   Hire Local Talent
                 </Button>
@@ -274,14 +274,17 @@ export default function Home() {
           <FooterColumn 
             title="For Clients" 
             links={['Post a Job', 'Find Freelancers', 'Enterprise Solutions']} 
+            hrefs={['/dashboard/jobs', '/dashboard/freelancers', '#']}
           />
           <FooterColumn 
             title="For Freelancers" 
             links={['Find Work', 'Create Profile', 'Success Stories']} 
+            hrefs={['/dashboard/jobs', '/dashboard/profile', '#']}
           />
           <FooterColumn 
             title="Support" 
             links={['Help Center', 'Trust & Safety', 'Contact Us']} 
+            hrefs={['#', '#', '#']}
           />
         </div>
 
@@ -330,9 +333,11 @@ function JobCard({ title, location, description, budget, type, icon, suffix = ''
         <div className="text-xl font-black text-white italic tracking-tighter">
           {budget}<span className="text-[10px] text-muted-foreground font-black uppercase ml-1">{suffix}</span>
         </div>
-        <Button variant="link" className="text-primary p-0 h-auto font-black uppercase tracking-widest text-[10px] hover:no-underline">
-          Apply Now
-        </Button>
+        <Link href="/dashboard/jobs">
+          <Button variant="link" className="text-primary p-0 h-auto font-black uppercase tracking-widest text-[10px] hover:no-underline">
+            Apply Now
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );
@@ -385,21 +390,23 @@ function FreelancerCard({ name, role, location, rating, jobs, avatar }: {
         </div>
       </div>
       
-      <Button className="w-full h-11 bg-secondary/50 hover:bg-primary text-white font-black uppercase tracking-widest text-[10px] rounded-xl transition-all">
-        View Profile
-      </Button>
+      <Link href="/dashboard/freelancers">
+        <Button className="w-full h-11 bg-secondary/50 hover:bg-primary text-white font-black uppercase tracking-widest text-[10px] rounded-xl transition-all">
+          View Profile
+        </Button>
+      </Link>
     </Card>
   );
 }
 
-function FooterColumn({ title, links }: { title: string, links: string[] }) {
+function FooterColumn({ title, links, hrefs }: { title: string, links: string[], hrefs: string[] }) {
   return (
     <div className="space-y-6">
       <h4 className="text-[11px] font-black uppercase tracking-widest text-white">{title}</h4>
       <ul className="space-y-4">
-        {links.map(link => (
+        {links.map((link, idx) => (
           <li key={link}>
-            <Link href="#" className="text-[10px] font-black text-muted-foreground hover:text-primary transition-colors uppercase tracking-[0.2em]">
+            <Link href={hrefs[idx]} className="text-[10px] font-black text-muted-foreground hover:text-primary transition-colors uppercase tracking-[0.2em]">
               {link}
             </Link>
           </li>
