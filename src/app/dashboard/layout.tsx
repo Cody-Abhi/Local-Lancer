@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -15,7 +16,7 @@ import {
   Search as SearchIcon,
   Menu,
   X,
-  Map as MapIcon
+  PlusCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -24,10 +25,9 @@ import { Toaster } from '@/components/ui/toaster';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard/overview', icon: LayoutDashboard },
-  { name: 'Jobs', href: '/dashboard/jobs', icon: Briefcase },
+  { name: 'Find Work', href: '/dashboard/jobs', icon: Briefcase },
   { name: 'Freelancers', href: '/dashboard/freelancers', icon: Users },
   { name: 'Messages', href: '/dashboard/chat', icon: MessageSquare },
-  { name: 'Profile', href: '/dashboard/profile', icon: User },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -35,75 +35,108 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen bg-[#FDFDFD] overflow-hidden text-[#1A1A1A]">
       {/* Sidebar Desktop */}
-      <aside className="hidden md:flex flex-col w-64 border-r bg-sidebar shrink-0">
+      <aside className="hidden md:flex flex-col w-64 border-r bg-white shrink-0">
         <div className="p-6 flex items-center gap-2">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <span className="text-white font-bold">L</span>
           </div>
-          <span className="text-lg font-bold text-foreground">LucknowConnect</span>
+          <span className="text-lg font-bold">LucknowLink</span>
         </div>
-        <nav className="flex-1 px-4 space-y-1 mt-4">
+        
+        <nav className="flex-1 px-4 space-y-2 mt-4">
           {navItems.map((item) => (
             <Link 
               key={item.href} 
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
+                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all",
                 pathname.startsWith(item.href) 
-                  ? "bg-primary text-white" 
-                  : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  ? "bg-primary/10 text-primary" 
+                  : "text-muted-foreground hover:bg-secondary/20 hover:text-foreground"
               )}
             >
-              <item.icon className="w-5 h-5" />
+              <item.icon className={cn("w-5 h-5", pathname.startsWith(item.href) ? "text-primary" : "text-muted-foreground")} />
               {item.name}
             </Link>
           ))}
-        </nav>
-        <div className="p-4 border-t border-sidebar-border">
-          <Link href="/login" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-all">
-            <LogOut className="w-5 h-5" />
-            Logout
+          <Link 
+            href="/dashboard/profile"
+            className={cn(
+              "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all",
+              pathname === '/dashboard/profile' 
+                ? "bg-primary/10 text-primary" 
+                : "text-muted-foreground hover:bg-secondary/20 hover:text-foreground"
+            )}
+          >
+            <User className={cn("w-5 h-5", pathname === '/dashboard/profile' ? "text-primary" : "text-muted-foreground")} />
+            My Profile
           </Link>
+        </nav>
+
+        <div className="p-4 mt-auto">
+          <Button className="w-full bg-primary hover:bg-primary/90 rounded-xl py-6 font-bold flex items-center gap-2">
+            <PlusCircle className="w-5 h-5" />
+            Post a Service
+          </Button>
+          <div className="mt-4 pt-4 border-t">
+            <Link href="/login" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-muted-foreground hover:bg-red-50 hover:text-red-500 transition-all">
+              <LogOut className="w-5 h-5" />
+              Logout
+            </Link>
+          </div>
         </div>
       </aside>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b flex items-center justify-between px-4 md:px-8 bg-background/80 backdrop-blur-md sticky top-0 z-30">
-          <div className="flex items-center gap-4">
+        <header className="h-20 border-b flex items-center justify-between px-8 bg-white/80 backdrop-blur-md sticky top-0 z-30">
+          <div className="flex items-center gap-4 flex-1">
              <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setSidebarOpen(true)}>
                <Menu className="w-6 h-6" />
              </Button>
-             <div className="hidden md:flex items-center gap-2 bg-secondary/50 rounded-full px-4 py-1.5 border min-w-[300px]">
+             <div className="hidden md:flex items-center gap-3 bg-secondary/20 rounded-2xl px-5 py-2.5 min-w-[360px] border border-transparent focus-within:border-primary/20 transition-all">
                 <SearchIcon className="w-4 h-4 text-muted-foreground" />
                 <input 
                   placeholder="Search jobs, skills, freelancers..." 
-                  className="bg-transparent border-none outline-none text-sm w-full placeholder:text-muted-foreground"
+                  className="bg-transparent border-none outline-none text-sm w-full placeholder:text-muted-foreground font-medium"
                 />
              </div>
           </div>
           
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full" />
-            </Button>
-            <div className="flex items-center gap-3 pl-4 border-l">
-              <div className="text-right hidden sm:block">
-                <div className="text-sm font-medium">Amit Gupta</div>
-                <div className="text-xs text-muted-foreground">Client Profile</div>
+          <div className="flex items-center gap-6">
+            <div className="hidden lg:flex items-center gap-8 mr-4">
+              {navItems.map(item => (
+                <Link 
+                  key={item.href} 
+                  href={item.href} 
+                  className={cn(
+                    "text-sm font-bold transition-colors",
+                    pathname.startsWith(item.href) ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full hover:bg-secondary/30">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full ring-2 ring-white" />
+              </Button>
+              <div className="flex items-center gap-3 pl-2">
+                <Avatar className="w-10 h-10 ring-2 ring-primary/10">
+                  <AvatarImage src="https://picsum.photos/seed/rahul_avatar/100/100" />
+                  <AvatarFallback>RS</AvatarFallback>
+                </Avatar>
               </div>
-              <Avatar className="w-9 h-9 border border-primary/20">
-                <AvatarImage src="https://picsum.photos/seed/amit/100/100" />
-                <AvatarFallback>AG</AvatarFallback>
-              </Avatar>
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <main className="flex-1 overflow-y-auto p-8 bg-[#FDFDFD]">
           {children}
         </main>
       </div>
@@ -112,13 +145,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-          <div className="relative w-72 bg-sidebar h-full shadow-2xl flex flex-col animate-in slide-in-from-left duration-300">
+          <div className="relative w-72 bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-left duration-300">
             <div className="p-6 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold">L</span>
                 </div>
-                <span className="text-lg font-bold text-foreground">LucknowConnect</span>
+                <span className="text-lg font-bold">LucknowLink</span>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>
                 <X className="w-6 h-6" />
@@ -131,10 +164,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
+                    "flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-all",
                     pathname.startsWith(item.href) 
                       ? "bg-primary text-white" 
-                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      : "text-muted-foreground hover:bg-secondary/20 hover:text-foreground"
                   )}
                 >
                   <item.icon className="w-5 h-5" />
@@ -142,12 +175,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Link>
               ))}
             </nav>
-            <div className="p-4 border-t border-sidebar-border">
-              <Link href="/login" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-all">
-                <LogOut className="w-5 h-5" />
-                Logout
-              </Link>
-            </div>
           </div>
         </div>
       )}
