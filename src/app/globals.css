@@ -4,34 +4,26 @@
 
 @layer base {
   :root {
-    --background: 222 47% 4%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 7%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 4%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 28 100% 58%;
+    --background: 27 30% 5%;
+    --foreground: 27 20% 98%;
+    --card: 27 30% 8%;
+    --card-foreground: 27 20% 98%;
+    --popover: 27 30% 5%;
+    --popover-foreground: 27 20% 98%;
+    --primary: 27 100% 58%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 222 47% 12%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 222 47% 12%;
-    --muted-foreground: 215.4 16.3% 56.9%;
-    --accent: 28 100% 58%;
+    --secondary: 27 42% 12%;
+    --secondary-foreground: 27 20% 98%;
+    --muted: 27 42% 12%;
+    --muted-foreground: 27 15% 60%;
+    --accent: 27 100% 58%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 222 47% 12%;
-    --input: 222 47% 12%;
-    --ring: 28 100% 58%;
-    --radius: 1rem;
-    --sidebar-background: 222 47% 4%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 28 100% 58%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 47% 12%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 222 47% 12%;
-    --sidebar-ring: 28 100% 58%;
+    --border: 27 42% 12%;
+    --input: 27 42% 12%;
+    --ring: 27 100% 58%;
+    --radius: 1.25rem;
   }
 }
 
@@ -49,4 +41,20 @@
 
 .map-container {
   mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-secondary rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted;
 }

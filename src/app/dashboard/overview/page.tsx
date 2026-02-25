@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -14,7 +13,8 @@ import {
   Briefcase, 
   ChevronRight, 
   Smartphone, 
-  Code
+  Code,
+  Zap
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { cn } from '@/lib/utils';
@@ -36,21 +36,18 @@ export default function DashboardOverview() {
   const { user } = useUser();
   const db = useFirestore();
 
-  // Fetch Real-time Stats
   const statsRef = useMemoFirebase(() => {
     if (!db || !user) return null;
     return doc(db, 'users', user.uid, 'stats', 'summary');
   }, [db, user]);
   const { data: stats } = useDoc<any>(statsRef);
 
-  // Fetch Real-time Milestones
   const milestonesRef = useMemoFirebase(() => {
     if (!db || !user) return null;
     return query(collection(db, 'users', user.uid, 'milestones'), limit(5));
   }, [db, user]);
   const { data: milestones = [] } = useCollection<any>(milestonesRef);
 
-  // Fallback values if no data exists in Firestore yet (to keep prototype looking good)
   const displayStats = {
     earnings: stats?.totalEarnings ?? 45200,
     balance: stats?.escrowBalance ?? 12500,
@@ -64,67 +61,66 @@ export default function DashboardOverview() {
   ];
 
   return (
-    <div className="space-y-6 max-w-[1200px] mx-auto pb-10">
+    <div className="space-y-8 max-w-[1400px] mx-auto pb-20">
       {/* Availability Status Card */}
-      <Card className="bg-card border-primary/10 shadow-sm overflow-hidden">
-        <CardContent className="p-6 flex items-center justify-between bg-gradient-to-r from-primary/5 to-transparent">
-          <div className="flex items-start gap-4">
-            <div className="p-2 bg-primary/10 rounded-full mt-1">
-              <MapPin className="w-5 h-5 text-primary" />
+      <Card className="bg-card/40 border-primary/10 shadow-2xl rounded-[2rem] overflow-hidden">
+        <CardContent className="p-10 flex items-center justify-between bg-gradient-to-r from-primary/10 via-transparent to-transparent">
+          <div className="flex items-start gap-6">
+            <div className="p-4 bg-primary/20 rounded-2xl shadow-xl shadow-primary/5">
+              <MapPin className="w-8 h-8 text-primary" />
             </div>
-            <div className="space-y-1">
-              <h3 className="font-bold text-lg">Availability Status</h3>
-              <p className="text-sm text-muted-foreground max-w-md">
-                Toggle to show clients in <span className="font-semibold text-foreground">Lucknow & surrounding areas (50km)</span> that you are available for immediate work.
+            <div className="space-y-2">
+              <h3 className="font-black text-2xl italic tracking-tight text-white">Lucknow Active Status</h3>
+              <p className="text-muted-foreground text-base max-w-xl font-medium leading-relaxed">
+                You are currently visible to clients in <span className="text-primary font-bold underline decoration-primary/30 underline-offset-4">Gomti Nagar & Hazratganj</span>. Toggle to pause new local inquiries.
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3 bg-background/50 p-2 px-4 rounded-full border border-primary/20">
+          <div className="flex items-center gap-4 bg-background/60 p-3 px-6 rounded-2xl border border-primary/20 shadow-inner">
             <Switch 
               checked={isAvailable} 
               onCheckedChange={setIsAvailable} 
               className="data-[state=checked]:bg-primary"
             />
-            <span className="text-sm font-bold">{isAvailable ? 'Available' : 'Busy'}</span>
+            <span className="text-sm font-black uppercase tracking-widest text-primary">{isAvailable ? 'Live Now' : 'Off Duty'}</span>
           </div>
         </CardContent>
       </Card>
 
       {/* Metric Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <MetricCard 
           title="Total Earnings" 
           value={`₹${displayStats.earnings.toLocaleString('en-IN')}`} 
           trend="+12%" 
-          icon={<TrendingUp className="w-5 h-5 text-green-500" />} 
+          icon={<TrendingUp className="w-6 h-6 text-green-500" />} 
           variant="green"
         />
         <MetricCard 
           title="Escrow Balance" 
           value={`₹${displayStats.balance.toLocaleString('en-IN')}`} 
           trend="+5%" 
-          icon={<Wallet className="w-5 h-5 text-blue-500" />} 
+          icon={<Wallet className="w-6 h-6 text-primary" />} 
           variant="blue"
         />
         <MetricCard 
           title="Active Projects" 
           value={displayStats.projects.toString()} 
           trend="0%" 
-          icon={<Briefcase className="w-5 h-5 text-orange-500" />} 
+          icon={<Briefcase className="w-6 h-6 text-orange-500" />} 
           variant="orange"
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Milestones and Analytics */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Active Milestones */}
-          <Card className="bg-card shadow-sm border-none">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xl font-bold">Active Milestones</CardTitle>
-              <Button variant="link" className="text-primary font-bold">View All</Button>
+        <div className="lg:col-span-2 space-y-8">
+          <Card className="bg-card/40 shadow-2xl border-none rounded-[2.5rem] p-4">
+            <CardHeader className="flex flex-row items-center justify-between p-6">
+              <CardTitle className="text-2xl font-black italic text-white tracking-tight">Active Milestones</CardTitle>
+              <Button variant="link" className="text-primary font-black uppercase text-xs tracking-widest">Manage All</Button>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="px-6 space-y-8 pb-10">
               {displayMilestones.map((m: any) => (
                 <MilestoneItem 
                   key={m.id}
@@ -132,47 +128,46 @@ export default function DashboardOverview() {
                   description={m.description} 
                   progress={m.progress} 
                   dueDate={m.dueDate}
-                  icon={m.type === 'design' ? <Smartphone className="w-5 h-5" /> : <Code className="w-5 h-5" />}
+                  icon={m.type === 'design' ? <Smartphone className="w-6 h-6" /> : <Code className="w-6 h-6" />}
                 />
               ))}
             </CardContent>
           </Card>
 
-          {/* Profile Views Chart */}
-          <Card className="bg-card shadow-sm border-none">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <Card className="bg-card/40 shadow-2xl border-none rounded-[2.5rem] p-4">
+            <CardHeader className="flex flex-row items-center justify-between p-6">
               <div className="space-y-1">
-                <CardTitle className="text-xl font-bold">Profile Views (Local)</CardTitle>
-                <p className="text-sm text-muted-foreground">Views from Lucknow businesses</p>
+                <CardTitle className="text-2xl font-black italic text-white tracking-tight">Profile Analytics</CardTitle>
+                <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest">Views from local businesses</p>
               </div>
-              <div className="flex bg-secondary/30 p-1 rounded-lg">
-                <Button variant="ghost" size="sm" className="h-7 text-xs px-3">7D</Button>
-                <Button variant="secondary" size="sm" className="h-7 text-xs px-3 bg-primary text-white hover:bg-primary/90 shadow-sm">30D</Button>
+              <div className="flex bg-secondary/50 p-1.5 rounded-2xl border border-border/50">
+                <Button variant="ghost" size="sm" className="h-9 text-xs font-black px-4 rounded-xl">7D</Button>
+                <Button variant="secondary" size="sm" className="h-9 text-xs font-black px-4 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-xl">30D</Button>
               </div>
             </CardHeader>
-            <CardContent>
-               <div className="text-3xl font-bold mb-6">{displayStats.views.toLocaleString()}</div>
-               <div className="h-64 w-full">
+            <CardContent className="px-6 pb-10">
+               <div className="text-5xl font-black text-white mb-8 italic tracking-tighter">{displayStats.views.toLocaleString()}</div>
+               <div className="h-72 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData}>
                       <Tooltip 
-                        cursor={{fill: 'transparent'}}
+                        cursor={{fill: 'rgba(255, 140, 43, 0.05)'}}
                         content={({ active, payload }) => {
                           if (active && payload && payload.length) {
                             return (
-                              <div className="bg-popover border p-2 rounded-lg shadow-xl text-xs font-bold">
-                                {payload[0].value} Views
+                              <div className="bg-card border border-primary/20 p-3 rounded-2xl shadow-2xl text-xs font-black text-primary">
+                                {payload[0].value} VIEWS
                               </div>
                             );
                           }
                           return null;
                         }}
                       />
-                      <Bar dataKey="views" radius={[6, 6, 0, 0]}>
+                      <Bar dataKey="views" radius={[8, 8, 0, 0]}>
                         {chartData.map((entry, index) => (
                           <Cell 
                             key={`cell-${index}`} 
-                            fill={index === 5 ? 'hsl(var(--primary))' : 'hsl(var(--secondary))'} 
+                            fill={index === 5 ? 'hsl(var(--primary))' : 'rgba(255, 140, 43, 0.15)'} 
                           />
                         ))}
                       </Bar>
@@ -180,8 +175,8 @@ export default function DashboardOverview() {
                         dataKey="name" 
                         axisLine={false} 
                         tickLine={false} 
-                        tick={{fontSize: 12, fill: 'hsl(var(--muted-foreground))'}}
-                        dy={10}
+                        tick={{fontSize: 12, fill: 'hsl(var(--muted-foreground))', fontWeight: '900'}}
+                        dy={15}
                       />
                     </BarChart>
                   </ResponsiveContainer>
@@ -191,23 +186,21 @@ export default function DashboardOverview() {
         </div>
 
         {/* Right Column: Nearby Matches and Map */}
-        <div className="space-y-6">
-          <Card className="bg-card shadow-sm border-none">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xl font-bold">Nearby Matches</CardTitle>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
-                <MapPin className="w-3 h-3" />
-                5-10km
-              </div>
+        <div className="space-y-8">
+          <Card className="bg-card/40 shadow-2xl border-none rounded-[2.5rem] p-4">
+            <CardHeader className="flex flex-row items-center justify-between p-6">
+              <CardTitle className="text-2xl font-black italic text-white tracking-tight">Nearby Jobs</CardTitle>
+              <Badge className="bg-primary/10 text-primary border-none font-black text-[10px] tracking-widest px-3 py-1">
+                LUCKNOW ONLY
+              </Badge>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="px-6 space-y-6 pb-10">
               <JobMatchItem 
                 title="Wordpress Developer for Café"
                 location="Gomti Nagar (2.4km)"
                 budget="₹8,000"
                 category="WEBSITE"
                 time="2h ago"
-                categoryColor="text-blue-500 bg-blue-500/10"
               />
               <JobMatchItem 
                 title="Logo Design for Startup"
@@ -215,7 +208,6 @@ export default function DashboardOverview() {
                 budget="₹3,500"
                 category="DESIGN"
                 time="5h ago"
-                categoryColor="text-purple-500 bg-purple-500/10"
               />
               <JobMatchItem 
                 title="Flutter Fixes Needed"
@@ -223,25 +215,24 @@ export default function DashboardOverview() {
                 budget="₹15,000"
                 category="MOBILE"
                 time="1d ago"
-                categoryColor="text-orange-500 bg-orange-500/10"
               />
             </CardContent>
           </Card>
 
           {/* Map Preview Card */}
-          <div className="relative group cursor-pointer overflow-hidden rounded-2xl border bg-card shadow-sm h-40">
+          <div className="relative group cursor-pointer overflow-hidden rounded-[2.5rem] border border-primary/20 bg-card/40 shadow-2xl h-60">
              <img 
-              src="https://picsum.photos/seed/lucknow_map_dashboard/600/400" 
+              src="https://picsum.photos/seed/lucknow_map_dashboard/800/600" 
               alt="Lucknow Map" 
-              className="w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-500"
+              className="w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-1000 group-hover:scale-110"
               data-ai-hint="Lucknow map"
              />
-             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-4">
-                <div className="text-white text-xs font-medium mb-0.5">View Map</div>
-                <div className="text-white font-bold flex items-center justify-between">
-                   Lucknow • 12 Jobs Nearby
-                   <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
-                      <ChevronRight className="w-4 h-4" />
+             <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent flex flex-col justify-end p-8">
+                <div className="text-primary text-[10px] font-black uppercase tracking-widest mb-2">Live Heatmap</div>
+                <div className="text-white text-xl font-black italic flex items-center justify-between tracking-tight">
+                   Lucknow • 12 Local Leads
+                   <div className="w-12 h-12 rounded-2xl bg-primary text-white shadow-xl shadow-primary/20 flex items-center justify-center transition-transform group-hover:translate-x-2">
+                      <ChevronRight className="w-6 h-6" />
                    </div>
                 </div>
              </div>
@@ -259,31 +250,26 @@ function MetricCard({ title, value, trend, icon, variant }: {
   icon: React.ReactNode,
   variant: 'green' | 'blue' | 'orange'
 }) {
-  const bgColors = {
-    green: 'bg-green-500/10',
-    blue: 'bg-blue-500/10',
-    orange: 'bg-orange-500/10',
-  };
-
   return (
-    <Card className="bg-card border-none shadow-sm relative overflow-hidden group">
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start mb-6">
-          <div className={cn("p-2 rounded-xl", bgColors[variant])}>
+    <Card className="bg-card/40 border border-primary/5 shadow-2xl relative overflow-hidden group rounded-[2.5rem] transition-all hover:border-primary/20">
+      <CardContent className="p-10">
+        <div className="flex justify-between items-start mb-10">
+          <div className="p-4 rounded-2xl bg-primary/10 shadow-inner group-hover:scale-110 transition-transform duration-500">
             {icon}
           </div>
           <Badge variant="secondary" className={cn(
-            "text-[10px] font-bold h-6 flex items-center gap-1",
-            trend.startsWith('+') ? 'text-green-500 bg-green-500/10' : 'text-muted-foreground'
+            "text-[10px] font-black h-7 px-4 flex items-center gap-1.5 uppercase tracking-widest rounded-full",
+            trend.startsWith('+') ? 'text-green-500 bg-green-500/10' : 'text-muted-foreground bg-secondary/50'
           )}>
             {trend.startsWith('+') && <TrendingUp className="w-3 h-3" />}
             {trend}
           </Badge>
         </div>
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-3xl font-bold tracking-tight">{value}</p>
+        <div className="space-y-2">
+          <p className="text-sm font-black uppercase tracking-widest text-muted-foreground">{title}</p>
+          <p className="text-4xl font-black tracking-tighter text-white italic">{value}</p>
         </div>
+        <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors" />
       </CardContent>
     </Card>
   );
@@ -297,54 +283,55 @@ function MilestoneItem({ title, description, progress, dueDate, icon }: {
   icon: React.ReactNode
 }) {
   return (
-    <div className="group border-b last:border-0 pb-6 last:pb-0">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-secondary/50 flex items-center justify-center text-muted-foreground">
+    <div className="group border-b border-border/50 last:border-0 pb-10 last:pb-0">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-6">
+          <div className="w-16 h-16 rounded-2xl bg-secondary/50 flex items-center justify-center text-primary shadow-inner group-hover:shadow-primary/5 group-hover:bg-secondary transition-all">
             {icon}
           </div>
           <div>
-            <h4 className="font-bold text-sm">{title}</h4>
-            <p className="text-xs text-muted-foreground">{description}</p>
+            <h4 className="font-black text-lg text-white italic tracking-tight">{title}</h4>
+            <p className="text-sm text-muted-foreground font-medium">{description}</p>
           </div>
         </div>
-        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{dueDate}</div>
+        <div className="text-[10px] font-black text-primary uppercase tracking-[0.2em] bg-primary/5 px-3 py-1.5 rounded-full">{dueDate}</div>
       </div>
-      <div className="space-y-2">
-        <div className="flex justify-between text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-          <span>Progress</span>
-          <span>{progress}%</span>
+      <div className="space-y-4">
+        <div className="flex justify-between text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">
+          <span>COMPLETION RATE</span>
+          <span className="text-primary">{progress}%</span>
         </div>
-        <Progress value={progress} className="h-2.5 bg-secondary/30" />
+        <Progress value={progress} className="h-3 bg-secondary/30 rounded-full" />
       </div>
     </div>
   );
 }
 
-function JobMatchItem({ title, location, budget, category, time, categoryColor }: { 
+function JobMatchItem({ title, location, budget, category, time }: { 
   title: string, 
   location: string, 
   budget: string, 
   category: string,
-  time: string,
-  categoryColor: string
+  time: string
 }) {
   return (
-    <div className="p-4 rounded-2xl border bg-card/50 hover:border-primary/30 transition-all group">
-      <div className="flex justify-between items-start mb-2">
-        <Badge className={cn("text-[9px] font-black h-5 px-2", categoryColor)}>
+    <div className="p-6 rounded-[2rem] border border-border/50 bg-secondary/20 hover:border-primary/30 hover:bg-secondary/40 transition-all group cursor-pointer shadow-lg">
+      <div className="flex justify-between items-start mb-4">
+        <Badge className="text-[9px] font-black h-6 px-3 tracking-widest bg-primary/10 text-primary border-none">
           {category}
         </Badge>
-        <span className="text-[10px] text-muted-foreground font-medium">{time}</span>
+        <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{time}</span>
       </div>
-      <h4 className="font-bold text-sm mb-1 group-hover:text-primary transition-colors">{title}</h4>
-      <div className="flex items-center gap-1 text-[10px] text-muted-foreground mb-4">
-        <MapPin className="w-3 h-3" />
+      <h4 className="font-black text-base mb-2 group-hover:text-primary transition-colors text-white italic tracking-tight">{title}</h4>
+      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-6 font-medium">
+        <MapPin className="w-3.5 h-3.5 text-primary" />
         {location}
       </div>
-      <div className="flex items-center justify-between">
-        <div className="font-bold text-lg">{budget}</div>
-        <Button variant="link" className="text-primary font-bold p-0 h-auto text-xs">Apply Now</Button>
+      <div className="flex items-center justify-between pt-4 border-t border-border/50">
+        <div className="font-black text-2xl text-white tracking-tighter italic">{budget}</div>
+        <Button variant="link" className="text-primary font-black uppercase tracking-widest p-0 h-auto text-[10px] hover:no-underline hover:translate-x-1 transition-transform">
+          Quick Apply
+        </Button>
       </div>
     </div>
   );

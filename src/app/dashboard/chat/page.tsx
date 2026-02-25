@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
@@ -7,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Languages, Phone, Video, Info, Search, MoreVertical, Sparkles, User as UserIcon } from 'lucide-react';
+import { Send, Languages, Phone, Video, Info, Search, MoreVertical, Sparkles, User as UserIcon, MessageSquare as MsgIcon } from 'lucide-react';
 import { dynamicChatTranslation } from '@/ai/flows/dynamic-chat-translation';
 import { ChatMessage, User } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -39,12 +38,10 @@ export default function ChatPage() {
   const [isTranslating, setIsTranslating] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Generate a consistent ID for the conversation between two users
   const conversationId = activeRecipient && currentUser 
     ? [currentUser.uid, activeRecipient.id].sort().join('_') 
     : null;
 
-  // Real-time messages for active conversation
   const messagesQuery = useMemoFirebase(() => {
     if (!db || !conversationId) return null;
     return query(
@@ -56,7 +53,6 @@ export default function ChatPage() {
 
   const { data: messages = [] } = useCollection(messagesQuery);
 
-  // Scroll to bottom when messages change
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -69,7 +65,6 @@ export default function ChatPage() {
     const messageText = input;
     setInput('');
 
-    // Ensure conversation doc exists
     const convRef = doc(db, 'conversations', conversationId);
     setDoc(convRef, {
       participants: [currentUser.uid, activeRecipient?.id],
@@ -77,7 +72,6 @@ export default function ChatPage() {
       updatedAt: serverTimestamp()
     }, { merge: true });
 
-    // Add message
     addDoc(collection(db, 'conversations', conversationId, 'messages'), {
       senderId: currentUser.uid,
       text: messageText,
@@ -100,17 +94,20 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="h-[calc(100vh-140px)] flex gap-4">
+    <div className="h-[calc(100vh-160px)] flex gap-8 max-w-[1600px] mx-auto pb-10">
       {/* Sidebar Contacts */}
-      <Card className="hidden lg:flex flex-col w-80 bg-card shrink-0 border-primary/5">
-        <CardHeader className="p-4 border-b">
-          <div className="relative">
-            <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Search messages..." className="pl-9 bg-secondary/30" />
+      <Card className="hidden lg:flex flex-col w-96 bg-card/40 shrink-0 border-border/50 rounded-[2.5rem] overflow-hidden shadow-2xl">
+        <CardHeader className="p-8 border-b border-border/50 bg-secondary/20">
+          <div className="relative group">
+            <Search className="absolute left-4 top-4 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <Input 
+              placeholder="Search conversations..." 
+              className="h-14 pl-12 bg-background/50 border-border/50 rounded-2xl font-bold" 
+            />
           </div>
         </CardHeader>
         <ScrollArea className="flex-1">
-          <div className="p-2 space-y-1">
+          <div className="p-4 space-y-2">
             {mockUsers.map((user) => (
               <ContactItem 
                 key={user.id}
@@ -124,37 +121,42 @@ export default function ChatPage() {
       </Card>
 
       {/* Main Chat Area */}
-      <Card className="flex-1 flex flex-col bg-card border-primary/5 overflow-hidden">
+      <Card className="flex-1 flex flex-col bg-card/40 border-border/50 rounded-[2.5rem] overflow-hidden shadow-2xl">
         {activeRecipient ? (
           <>
-            <div className="p-4 border-b flex items-center justify-between bg-secondary/10">
-               <div className="flex items-center gap-3">
-                  <Avatar className="w-10 h-10 ring-2 ring-primary/20">
-                    <AvatarImage src={activeRecipient.avatar} />
-                    <AvatarFallback>{activeRecipient.name[0]}</AvatarFallback>
-                  </Avatar>
+            <div className="p-6 border-b border-border/50 flex items-center justify-between bg-secondary/20">
+               <div className="flex items-center gap-5">
+                  <div className="relative">
+                    <Avatar className="w-14 h-14 ring-4 ring-primary/10 rounded-2xl">
+                      <AvatarImage src={activeRecipient.avatar} className="object-cover" />
+                      <AvatarFallback className="rounded-2xl font-black">{activeRecipient.name[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full ring-4 ring-card" />
+                  </div>
                   <div>
-                    <div className="font-bold flex items-center gap-2">
+                    <div className="font-black text-xl italic text-white flex items-center gap-3 tracking-tight">
                        {activeRecipient.name}
-                       {activeRecipient.verified && <div className="w-2 h-2 bg-green-500 rounded-full" />}
+                       {activeRecipient.verified && <ShieldCheck className="w-4 h-4 text-primary fill-current" />}
                     </div>
-                    <div className="text-xs text-muted-foreground">Local {activeRecipient.role} • Lucknow</div>
+                    <div className="text-[10px] font-black uppercase tracking-widest text-primary">Local {activeRecipient.role} • Lucknow Pro</div>
                   </div>
                </div>
-               <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="icon"><Phone className="w-5 h-5" /></Button>
-                  <Button variant="ghost" size="icon"><Video className="w-5 h-5" /></Button>
-                  <Button variant="ghost" size="icon"><Info className="w-5 h-5" /></Button>
-                  <Button variant="ghost" size="icon"><MoreVertical className="w-5 h-5" /></Button>
+               <div className="flex items-center gap-2">
+                  <ChatAction icon={<Phone className="w-5 h-5" />} />
+                  <ChatAction icon={<Video className="w-5 h-5" />} />
+                  <ChatAction icon={<Info className="w-5 h-5" />} />
+                  <ChatAction icon={<MoreVertical className="w-5 h-5" />} />
                </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-6" ref={scrollRef}>
+            <div className="flex-1 overflow-y-auto p-10 space-y-8 bg-background/30" ref={scrollRef}>
               {messages.length === 0 && (
-                <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground space-y-2 opacity-50">
-                  <MessageSquare className="w-12 h-12 mb-2" />
-                  <p className="font-medium">No messages yet</p>
-                  <p className="text-sm">Start a conversation with {activeRecipient.name}</p>
+                <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground space-y-4 opacity-50">
+                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                    <MsgIcon className="w-10 h-10 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-black italic text-white">Start the conversation</h3>
+                  <p className="max-w-xs font-medium">Messages are encrypted and private within LucknowLink.</p>
                 </div>
               )}
               {messages.map((msg: any) => {
@@ -162,21 +164,21 @@ export default function ChatPage() {
                 const timeStr = msg.timestamp?.toDate ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...';
                 
                 return (
-                  <div key={msg.id} className={cn("flex flex-col max-w-[80%]", isMe ? "ml-auto items-end" : "mr-auto items-start")}>
+                  <div key={msg.id} className={cn("flex flex-col max-w-[70%]", isMe ? "ml-auto items-end" : "mr-auto items-start")}>
                     <div className={cn(
-                      "px-4 py-3 rounded-2xl relative group transition-all",
-                      isMe ? "bg-primary text-white rounded-tr-none" : "bg-secondary/40 text-foreground rounded-tl-none border border-border/50"
+                      "px-6 py-4 rounded-[2rem] relative group transition-all shadow-xl",
+                      isMe ? "bg-primary text-white rounded-tr-none" : "bg-card/80 text-white rounded-tl-none border border-border/50"
                     )}>
-                      {msg.text}
+                      <p className="text-sm font-bold leading-relaxed">{msg.text}</p>
                       {msg.translatedText && (
-                         <div className="mt-2 pt-2 border-t border-white/20 text-sm italic opacity-90">
-                           <Sparkles className="w-3 h-3 inline-block mr-1" />
+                         <div className="mt-4 pt-4 border-t border-white/10 text-xs italic font-medium flex items-center gap-2">
+                           <Sparkles className="w-3.5 h-3.5 text-primary" />
                            {msg.translatedText}
                          </div>
                       )}
                       <div className={cn(
-                        "absolute -bottom-5 text-[10px] text-muted-foreground whitespace-nowrap",
-                        isMe ? "right-0" : "left-0"
+                        "absolute -bottom-6 text-[9px] font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap",
+                        isMe ? "right-2" : "left-2"
                       )}>
                         {timeStr}
                       </div>
@@ -185,7 +187,7 @@ export default function ChatPage() {
                         <button 
                           onClick={() => translateMessage(msg.id, msg.text)}
                           disabled={isTranslating}
-                          className="absolute -right-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-full hover:bg-primary/20 text-primary"
+                          className="absolute -right-12 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-2.5 rounded-2xl bg-primary/10 text-primary hover:bg-primary hover:text-white"
                           title="Translate to Hindi"
                         >
                           <Languages className="w-4 h-4" />
@@ -197,35 +199,37 @@ export default function ChatPage() {
               })}
             </div>
 
-            <div className="p-4 bg-secondary/10 border-t">
-               <div className="flex gap-2 items-center">
+            <div className="p-8 bg-secondary/20 border-t border-border/50">
+               <div className="flex gap-4 items-center">
                   <Input 
                     placeholder="Type your message..." 
-                    className="flex-1 h-12 bg-background/50 border-border/50" 
+                    className="flex-1 h-16 bg-background/50 border-border/50 rounded-2xl px-8 font-bold text-white focus:ring-primary/50" 
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                   />
                   <Button 
                     size="icon" 
-                    className="h-12 w-12 bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/20"
+                    className="h-16 w-16 bg-primary hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/20 transition-transform active:scale-90"
                     onClick={handleSend}
                     disabled={!input.trim()}
                   >
-                    <Send className="w-5 h-5 text-white" />
+                    <Send className="w-6 h-6 text-white" />
                   </Button>
                </div>
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-center p-12">
-            <div className="w-20 h-20 bg-secondary/30 rounded-full flex items-center justify-center mb-6">
-              <UserIcon className="w-10 h-10 text-muted-foreground" />
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-12 space-y-8">
+            <div className="w-32 h-32 bg-primary/10 rounded-[2.5rem] flex items-center justify-center mb-4">
+              <UserIcon className="w-16 h-16 text-primary" />
             </div>
-            <h3 className="text-xl font-bold mb-2">Select a Contact</h3>
-            <p className="text-muted-foreground max-w-xs">
-              Choose someone from the sidebar to start chatting in real-time.
-            </p>
+            <div className="space-y-2">
+              <h3 className="text-3xl font-black italic text-white tracking-tight">Select a Contact</h3>
+              <p className="text-muted-foreground max-w-sm text-lg font-medium">
+                Choose a verified Lucknow pro or client to start a real-time conversation.
+              </p>
+            </div>
           </div>
         )}
       </Card>
@@ -238,27 +242,35 @@ function ContactItem({ user, active, onClick }: { user: User, active: boolean, o
     <div 
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all",
-        active ? "bg-primary/10 border border-primary/20" : "hover:bg-secondary/30 border border-transparent"
+        "flex items-center gap-4 p-4 rounded-3xl cursor-pointer transition-all border border-transparent",
+        active ? "bg-primary text-white shadow-xl shadow-primary/10" : "hover:bg-secondary/40 hover:border-border/50"
       )}
     >
-      <Avatar className="w-12 h-12">
-        <AvatarImage src={user.avatar} />
-        <AvatarFallback>{user.name[0]}</AvatarFallback>
+      <Avatar className="w-14 h-14 rounded-2xl ring-2 ring-primary/10">
+        <AvatarImage src={user.avatar} className="object-cover" />
+        <AvatarFallback className="rounded-2xl font-black">{user.name[0]}</AvatarFallback>
       </Avatar>
       <div className="flex-1 min-w-0">
-        <div className="flex justify-between items-center mb-0.5">
-          <span className="font-bold truncate text-sm">{user.name}</span>
-          <span className="text-[10px] text-muted-foreground">Recently</span>
+        <div className="flex justify-between items-center mb-1">
+          <span className={cn("font-black italic tracking-tight", active ? "text-white" : "text-white")}>{user.name}</span>
+          <span className={cn("text-[9px] font-black uppercase tracking-widest", active ? "text-white/70" : "text-muted-foreground")}>Recently</span>
         </div>
-        <div className="text-[10px] text-primary/80 font-semibold uppercase tracking-wider mb-1 truncate">{user.role}</div>
-        <p className="text-xs text-muted-foreground truncate">{user.bio}</p>
+        <div className={cn("text-[9px] font-black uppercase tracking-widest mb-1.5", active ? "text-white/80" : "text-primary")}>{user.role}</div>
+        <p className={cn("text-xs truncate font-medium", active ? "text-white/70" : "text-muted-foreground")}>{user.bio}</p>
       </div>
     </div>
   );
 }
 
-function MessageSquare(props: any) {
+function ChatAction({ icon }: { icon: React.ReactNode }) {
+  return (
+    <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl bg-background/20 hover:bg-primary/10 hover:text-primary transition-all">
+      {icon}
+    </Button>
+  );
+}
+
+function ShieldCheck(props: any) {
   return (
     <svg
       {...props}
@@ -272,7 +284,8 @@ function MessageSquare(props: any) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+      <path d="m9 12 2 2 4-4" />
     </svg>
   )
 }
