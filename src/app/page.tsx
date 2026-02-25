@@ -1,7 +1,8 @@
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, ShieldCheck, Zap, Globe, MessageSquare, CreditCard } from 'lucide-react';
+import { MapPin, ShieldCheck, Zap, Globe, MessageSquare, CreditCard, ArrowRight } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -13,18 +14,17 @@ export default function Home() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold">L</span>
             </div>
-            <span className="text-xl font-bold tracking-tight text-foreground">LucknowConnect</span>
+            <span className="text-xl font-bold tracking-tight text-foreground">LucknowLink</span>
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <Link href="#features" className="text-sm font-medium hover:text-primary transition-colors">Features</Link>
-            <Link href="#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">How it Works</Link>
             <Link href="/dashboard/jobs" className="text-sm font-medium hover:text-primary transition-colors">Find Jobs</Link>
           </nav>
           <div className="flex items-center gap-3">
             <Link href="/login">
               <Button variant="ghost" size="sm">Login</Button>
             </Link>
-            <Link href="/login?signup=true">
+            <Link href="/signup">
               <Button size="sm" className="bg-primary hover:bg-primary/90">Join Platform</Button>
             </Link>
           </div>
@@ -39,25 +39,24 @@ export default function Home() {
             Hyper-Local Lucknow Marketplace
           </div>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 max-w-4xl leading-tight">
-            Connecting Lucknow's <span className="text-primary">Top Talent</span> with Local Opportunities
+            Connecting Lucknow's <span className="text-primary">Best Talent</span> with Local Opportunities
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mb-10">
-            The hyper-local marketplace for Lucknow. Hire trusted freelancers within your neighborhood with AI-powered matching and secure escrow payments.
+            The dedicated platform for Lucknow. Hire trusted local experts in your neighborhood with AI-powered matching and DPDP-compliant security.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
-            <Link href="/dashboard/jobs" className="flex-1">
-              <Button size="lg" className="w-full bg-primary text-white hover:bg-primary/90 h-14 text-lg">I want to Hire</Button>
-            </Link>
-            <Link href="/dashboard/jobs" className="flex-1">
-              <Button size="lg" variant="outline" className="w-full h-14 text-lg">I want to Work</Button>
+            <Link href="/signup" className="flex-1">
+              <Button size="lg" className="w-full bg-primary text-white hover:bg-primary/90 h-14 text-lg">
+                Get Started <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
             </Link>
           </div>
 
           <div className="mt-20 relative w-full max-w-5xl aspect-video rounded-2xl border bg-card/50 overflow-hidden shadow-2xl">
             <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10" />
             <img 
-              src="https://picsum.photos/seed/lucknow_map/1200/600" 
-              alt="LucknowConnect Map Interface" 
+              src="https://picsum.photos/seed/lucknow_map_2/1200/600" 
+              alt="LucknowLink Map Interface" 
               className="w-full h-full object-cover opacity-60 grayscale"
             />
             <div className="absolute inset-0 flex items-center justify-center z-20">
@@ -67,7 +66,7 @@ export default function Home() {
                        <Zap className="text-primary w-5 h-5" />
                     </div>
                     <div>
-                       <div className="text-sm font-bold">AI Matching Active</div>
+                       <div className="text-sm font-bold">AI Local Matching</div>
                        <div className="text-xs text-muted-foreground">Finding 52+ matches in Hazratganj</div>
                     </div>
                   </div>
@@ -84,37 +83,37 @@ export default function Home() {
       {/* Features Grid */}
       <section id="features" className="py-20 bg-secondary/30">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-16">Why LucknowConnect?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-16">Why LucknowLink?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <FeatureCard 
               icon={<MapPin className="text-primary" />}
               title="Geo-Targeted Search"
-              description="Find work or hire talent within a specific radius of your location in Lucknow."
+              description="Find work or hire talent within a specific radius of your neighborhood in Lucknow."
             />
             <FeatureCard 
               icon={<ShieldCheck className="text-primary" />}
-              title="Escrow Payments"
-              description="Funds are held securely until the work is approved by the client. Safe and transparent."
+              title="DPDP Compliant"
+              description="Securing your personal data according to the Digital Personal Data Protection Act 2023."
             />
             <FeatureCard 
               icon={<Zap className="text-primary" />}
-              title="AI Skill Matching"
-              description="Our GenAI agents analyze profiles and project needs for the perfect local fit."
+              title="AI Skill Suggestions"
+              description="Our GenAI agents analyze profiles to give you the perfect local match automatically."
             />
             <FeatureCard 
               icon={<MessageSquare className="text-primary" />}
-              title="Real-time Chat"
-              description="Integrated messaging with AI-powered translation for multi-lingual communication."
+              title="Lucknow Chat"
+              description="Integrated messaging with local context and easy contact management."
             />
             <FeatureCard 
               icon={<Globe className="text-primary" />}
               title="Verified Profiles"
-              description="Every freelancer goes through a verification process to ensure authenticity."
+              description="Every freelancer goes through a verification process to ensure local authenticity."
             />
             <FeatureCard 
               icon={<CreditCard className="text-primary" />}
-              title="Razorpay Integrated"
-              description="Fast, secure payments with full support for Indian UPI, Cards, and Netbanking."
+              title="Secure Escrow"
+              description="Safe payments for Lucknow businesses using secure digital holding accounts."
             />
           </div>
         </div>
@@ -127,14 +126,14 @@ export default function Home() {
             <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
               <span className="text-white font-bold text-xs">L</span>
             </div>
-            <span className="font-bold text-foreground">LucknowConnect</span>
+            <span className="font-bold text-foreground">LucknowLink</span>
           </div>
           <div className="flex gap-8">
             <Link href="#">Terms</Link>
-            <Link href="#">Privacy</Link>
+            <Link href="#">Privacy Policy</Link>
             <Link href="#">Contact</Link>
           </div>
-          <div>© 2025 LucknowConnect. All rights reserved.</div>
+          <div>© 2025 LucknowLink. Built for Uttar Pradesh.</div>
         </div>
       </footer>
     </div>

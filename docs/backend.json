@@ -1,0 +1,41 @@
+
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Store profile information for both freelancers and clients.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phoneNumber": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["freelancer", "client", "admin"] },
+        "location": {
+          "type": "object",
+          "properties": {
+            "lat": { "type": "number" },
+            "lng": { "type": "number" },
+            "address": { "type": "string" },
+            "pincode": { "type": "string" }
+          }
+        },
+        "skills": { "type": "array", "items": { "type": "string" } },
+        "bio": { "type": "string" },
+        "businessName": { "type": "string" },
+        "verified": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "role", "name"]
+    }
+  },
+  "auth": {
+    "providers": ["password", "phone"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "#/entities/User",
+      "description": "User profile documents indexed by Firebase Auth UID."
+    }
+  }
+}
