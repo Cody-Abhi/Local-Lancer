@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -35,9 +34,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
 
   return (
-    <div className="flex h-screen bg-[#FDFDFD] overflow-hidden text-[#1A1A1A]">
+    <div className="flex h-screen bg-background overflow-hidden text-foreground">
       {/* Sidebar Desktop */}
-      <aside className="hidden md:flex flex-col w-64 border-r bg-white shrink-0">
+      <aside className="hidden md:flex flex-col w-64 border-r bg-card shrink-0">
         <div className="p-6 flex items-center gap-2">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <span className="text-white font-bold">L</span>
@@ -81,7 +80,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             Post a Service
           </Button>
           <div className="mt-4 pt-4 border-t">
-            <Link href="/login" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-muted-foreground hover:bg-red-50 hover:text-red-500 transition-all">
+            <Link href="/login" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-muted-foreground hover:bg-red-500/10 hover:text-red-500 transition-all">
               <LogOut className="w-5 h-5" />
               Logout
             </Link>
@@ -91,7 +90,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-20 border-b flex items-center justify-between px-8 bg-white/80 backdrop-blur-md sticky top-0 z-30">
+        <header className="h-20 border-b flex items-center justify-between px-8 bg-background/80 backdrop-blur-md sticky top-0 z-30">
           <div className="flex items-center gap-4 flex-1">
              <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setSidebarOpen(true)}>
                <Menu className="w-6 h-6" />
@@ -124,7 +123,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full hover:bg-secondary/30">
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full ring-2 ring-white" />
+                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full ring-2 ring-background" />
               </Button>
               <div className="flex items-center gap-3 pl-2">
                 <Avatar className="w-10 h-10 ring-2 ring-primary/10">
@@ -136,7 +135,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-8 bg-[#FDFDFD]">
+        <main className="flex-1 overflow-y-auto p-8 bg-background">
           {children}
         </main>
       </div>
@@ -145,7 +144,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-          <div className="relative w-72 bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-left duration-300">
+          <div className="relative w-72 bg-card h-full shadow-2xl flex flex-col animate-in slide-in-from-left duration-300">
             <div className="p-6 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">

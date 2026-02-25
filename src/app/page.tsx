@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,7 +5,7 @@ import { MapPin, ShieldCheck, Zap, Globe, MessageSquare, CreditCard, ArrowRight 
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
       {/* Header */}
       <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -60,7 +59,7 @@ export default function Home() {
               className="w-full h-full object-cover opacity-60 grayscale"
             />
             <div className="absolute inset-0 flex items-center justify-center z-20">
-               <div className="p-8 bg-card border rounded-xl shadow-2xl max-w-sm text-left">
+               <div className="p-8 bg-card border rounded-xl shadow-2xl max-w-sm text-left backdrop-blur-md bg-opacity-80">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                        <Zap className="text-primary w-5 h-5" />
@@ -81,7 +80,7 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="py-20 bg-secondary/30">
+      <section id="features" className="py-20 bg-secondary/10">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-16">Why LucknowLink?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
