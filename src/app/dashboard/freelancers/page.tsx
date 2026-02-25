@@ -35,7 +35,7 @@ export default function FreelancersPage() {
     <div className="space-y-8 pb-10">
       {/* Header Section */}
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">
+        <h1 className="text-4xl font-bold tracking-tight text-foreground">
           Top Talent in <span className="text-primary">Lucknow</span>
         </h1>
         <p className="text-muted-foreground text-lg">
@@ -48,7 +48,7 @@ export default function FreelancersPage() {
         <div className="relative group">
           <Input 
             placeholder="Search for skills (e.g. React, UI/UX, Python)..." 
-            className="h-14 pl-12 pr-32 bg-[#1A1D2B] border-none text-white text-lg rounded-xl focus-visible:ring-1 focus-visible:ring-primary/50"
+            className="h-14 pl-12 pr-32 bg-card border-none text-foreground text-lg rounded-xl focus-visible:ring-1 focus-visible:ring-primary/50"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -65,7 +65,7 @@ export default function FreelancersPage() {
             <FilterButton label="Skillset" />
             <FilterButton label="Experience" />
             <Badge className="bg-primary/10 text-primary border border-primary/30 h-10 px-4 flex items-center gap-2 rounded-full cursor-pointer hover:bg-primary/20 transition-all">
-              Distance: < 20km
+              Distance: &lt; 20km
               <X className="w-4 h-4" />
             </Badge>
             <FilterButton label="Budget" />
@@ -86,7 +86,7 @@ export default function FreelancersPage() {
         {mockUsers.map((user) => (
           <Card 
             key={user.id} 
-            className="bg-[#1A1D2B] border-none hover:ring-1 hover:ring-primary/30 transition-all group overflow-hidden rounded-2xl"
+            className="bg-card border-none hover:ring-1 hover:ring-primary/30 transition-all group overflow-hidden rounded-2xl shadow-lg"
           >
             <CardHeader className="p-6 pb-4">
               <div className="flex justify-between items-start">
@@ -97,7 +97,7 @@ export default function FreelancersPage() {
                       <AvatarFallback>{user.name[0]}</AvatarFallback>
                     </Avatar>
                     {user.verified && (
-                      <div className="absolute -bottom-1 -right-1 bg-green-500 p-0.5 rounded-full ring-2 ring-[#1A1D2B]">
+                      <div className="absolute -bottom-1 -right-1 bg-green-500 p-0.5 rounded-full ring-2 ring-card">
                         <ShieldCheck className="w-3 h-3 text-white fill-current" />
                       </div>
                     )}
@@ -133,7 +133,7 @@ export default function FreelancersPage() {
                   <Badge 
                     key={skill} 
                     variant="secondary" 
-                    className="bg-[#2A2F45] text-muted-foreground border-none text-[10px] font-bold px-3 py-1"
+                    className="bg-secondary text-muted-foreground border-none text-[10px] font-bold px-3 py-1"
                   >
                     {skill}
                   </Badge>
@@ -172,7 +172,7 @@ export default function FreelancersPage() {
                 variant="secondary" 
                 size="icon" 
                 className={cn(
-                  "w-12 h-12 rounded-xl bg-[#2A2F45] hover:bg-[#363B57] transition-all",
+                  "w-12 h-12 rounded-xl bg-secondary hover:bg-secondary/80 transition-all",
                   favorites.includes(user.id) && "text-red-500"
                 )}
                 onClick={() => toggleFavorite(user.id)}
@@ -201,7 +201,7 @@ function FilterButton({ label }: { label: string }) {
   return (
     <Button 
       variant="outline" 
-      className="h-10 px-5 rounded-full bg-transparent border-white/10 text-muted-foreground hover:bg-white/5 font-medium"
+      className="h-10 px-5 rounded-full bg-transparent border-border text-muted-foreground hover:bg-secondary/50 font-medium"
     >
       {label}
       <ChevronDown className="w-4 h-4 ml-2 opacity-50" />
@@ -215,7 +215,7 @@ function PaginationButton({ label, icon, active }: { label?: string, icon?: Reac
       variant={active ? "default" : "ghost"}
       className={cn(
         "w-10 h-10 p-0 rounded-full font-bold",
-        active ? "bg-primary text-white" : "text-muted-foreground hover:bg-[#1A1D2B]"
+        active ? "bg-primary text-white" : "text-muted-foreground hover:bg-card"
       )}
     >
       {label || icon}
