@@ -37,6 +37,23 @@ export interface Job {
   skillsRequired: string[];
 }
 
+export interface Service {
+  id: string;
+  freelancerId: string;
+  title: string;
+  category: string;
+  price: number;
+  deliveryTime: string;
+  description: string;
+  perks: {
+    inPersonMeeting: boolean;
+    localSupport: boolean;
+    sameDayResponse: boolean;
+    bilingual: boolean;
+  };
+  createdAt: any;
+}
+
 export interface ChatMessage {
   id: string;
   senderId: string;

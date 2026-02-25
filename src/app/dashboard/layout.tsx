@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -75,10 +76,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         <div className="p-4 mt-auto">
-          <Button className="w-full bg-primary hover:bg-primary/90 rounded-xl py-6 font-bold flex items-center gap-2">
-            <PlusCircle className="w-5 h-5" />
-            Post a Service
-          </Button>
+          <Link href="/dashboard/post-service">
+            <Button className="w-full bg-primary hover:bg-primary/90 rounded-xl py-6 font-bold flex items-center gap-2">
+              <PlusCircle className="w-5 h-5" />
+              Post a Service
+            </Button>
+          </Link>
           <div className="mt-4 pt-4 border-t">
             <Link href="/login" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-muted-foreground hover:bg-red-500/10 hover:text-red-500 transition-all">
               <LogOut className="w-5 h-5" />
